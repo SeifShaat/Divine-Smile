@@ -1,0 +1,6 @@
+build:
+  - script: |
+      # Install CMake
+      curl -LO "https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-windows-x86_64.zip"
+      7z x cmake-3.22.1-windows-x86_64.zip
+      set PATH=%PATH%;%cd%\cmake-3.22.1-windows-x86_64\bin
