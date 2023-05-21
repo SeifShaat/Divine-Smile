@@ -1,6 +1,5 @@
 flask
 opencv-python
-boost
 cmake
 numpy
 dlib
