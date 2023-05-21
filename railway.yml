@@ -1,12 +1,15 @@
 build:
   - image: railway/python:3.9
   - script: |
+      apt-get update
+      apt-get install -y curl
+      apt-get install -y libssl-dev
+
       # Install CMake
-      curl -LO "https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-windows-x86_64.zip"
-      powershell -Command "Expand-Archive -Path 'cmake-3.22.1-windows-x86_64.zip' -DestinationPath 'C:\cmake'"
+      curl -LO "https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1-linux-x86_64.tar.gz"
+      tar -xf cmake-3.22.1-linux-x86_64.tar.gz
+      export PATH=$PWD/cmake-3.22.1-linux-x86_64/bin:$PATH
 
-      # Set CMake path environment variable
-      $env:PATH = "C:\cmake\cmake-3.22.1-windows-x86_64\bin;$env:PATH"
-
-      # Install C++ CMake tools for Windows
-      choco install -y cmake.install
+      # Install C++ CMake tools for Linux
+      apt-get install -y build-essential
+      apt-get install -y cmake
