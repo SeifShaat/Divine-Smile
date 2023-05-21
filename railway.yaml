@@ -1,5 +1,0 @@
-jobs:
-  setup:
-    name: Setup
-    steps:
-      - setup: ./setup.sh
