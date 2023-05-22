@@ -1,3 +1,0 @@
-[phases.setup]
-nixPkgs = ["...", "cmake"]
-aptPkgs = ["...", "libcrypt-dev"]
