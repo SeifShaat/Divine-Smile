@@ -6,6 +6,11 @@ import numpy as np
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def MainAccess():
+    response_data = {"message": "A7A"}
+    return jsonify(response_data)
+
 # Load the Haar Cascade classifier for face detection
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
