@@ -17,7 +17,7 @@ face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 # Load the dlib shape predictor for facial landmark detection
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-@app.route('/process_image', methods=['GET'])
+@app.route('/process_image', methods=['GET', 'POST'])
 def process_image():
     # Read the image data from the request
     image = request.files['image'].read()
