@@ -20,7 +20,7 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 @app.route('/process_image', methods=['GET'])
 def process_image():
     # Read the image data from the request
-    image = request.get_data()
+    image = request.files['image'].read()
 
     # Convert the image data to a NumPy array
     nparr = np.frombuffer(image, np.uint8)
