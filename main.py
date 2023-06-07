@@ -72,7 +72,8 @@ def process_image():
     processed_image_bytes = processed_image.tobytes()
 
     # Return the processed image as the response
-    return processed_image_bytes, jsonify(response_data)
+    return processed_image_bytes
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run()
