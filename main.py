@@ -60,7 +60,7 @@ def process_image():
             left_defect = True
         elif distance_right_eyebrow_nose_tip + 8 < distance_left_eyebrow_nose_tip:
             right_defect = True
-        else:
+        elif abs(distance_right_eyebrow_nose_tip - distance_left_eyebrow_nose_tip) <= 8:
             no_defect = True
 
     # Create a dictionary with the boolean results
