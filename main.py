@@ -3,6 +3,7 @@ import cv2
 import dlib
 import math
 import numpy as np
+import base64
 
 app = Flask(__name__)
 
@@ -21,9 +22,6 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 def process_image():
     # Read the image data from the request
     image = request.files['image'].read()
-    left_defect = False
-    right_defect = False
-    no_defect = False
 
     # Convert the image data to a NumPy array
     nparr = np.frombuffer(image, np.uint8)
@@ -53,26 +51,36 @@ def process_image():
         distance_left_eyebrow_nose_tip = math.sqrt((left_eyebrow_x - nose_tip_x) ** 2 + (left_eyebrow_y - nose_tip_y) ** 2)
         distance_right_eyebrow_nose_tip = math.sqrt((right_eyebrow_x - nose_tip_x) ** 2 + (right_eyebrow_y - nose_tip_y) ** 2)
 
+        # Output the result
+        cv2.putText(frame, "Distance between left eyebrow and nose tip: {:.2f}".format(distance_left_eyebrow_nose_tip), (x-100, y-150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        cv2.putText(frame, "Distance between right eyebrow and nose tip: {:.2f}".format(distance_right_eyebrow_nose_tip), (x-100, y-130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
         if distance_left_eyebrow_nose_tip + 5 < distance_right_eyebrow_nose_tip:
             left_defect = True
+            right_defect = False
+            no_defect = False
         elif distance_right_eyebrow_nose_tip + 5 < distance_left_eyebrow_nose_tip:
+            left_defect = False
             right_defect = True
+            no_defect = False
         else:
+            left_defect = False
+            right_defect = False
             no_defect = True
 
-    # Convert the processed frame back to bytes
-    _, processed_image = cv2.imencode('.jpg', frame)
-    processed_image_bytes = processed_image.tobytes()
+    # Convert the processed frame to base64-encoded string
+    _, encoded_image = cv2.imencode('.jpg', frame)
+    processed_image_bytes = base64.b64encode(encoded_image.tobytes()).decode('utf-8')
 
-    # Create the response data
+    # Create the response data dictionary
     response_data = {
-        "left_defect": left_defect,
-        "right_defect": right_defect,
-        "no_defect": no_defect,
-        "processed_image": processed_image_bytes,
+        'left_defect': left_defect,
+        'right_defect': right_defect,
+        'no_defect': no_defect,
+        'processed_image': processed_image_bytes
     }
 
-    # Return the response as JSON
+    # Return the response data as JSON
     return jsonify(response_data)
 
 if __name__ == '__main__':
