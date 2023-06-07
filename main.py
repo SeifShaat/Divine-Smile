@@ -33,7 +33,7 @@ def process_image():
     # Initialize boolean variables
     left_defect = False
     right_defect = False
-    no_defect = False
+    no_defect = True
 
     # If a face is detected, detect the facial landmarks and measure the distances
     for (x, y, w, h) in faces:
@@ -58,9 +58,11 @@ def process_image():
         # Update boolean variables based on the distances
         if distance_left_eyebrow_nose_tip + 8 < distance_right_eyebrow_nose_tip:
             left_defect = True
+            no_defect = False
         elif distance_right_eyebrow_nose_tip + 8 < distance_left_eyebrow_nose_tip:
             right_defect = True
-        elif abs(distance_right_eyebrow_nose_tip - distance_left_eyebrow_nose_tip) <= 8:
+            no_defect = False
+        else:
             no_defect = True
 
     # Create a dictionary with the boolean results
