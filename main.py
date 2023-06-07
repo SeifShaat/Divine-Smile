@@ -3,13 +3,12 @@ import cv2
 import dlib
 import math
 import numpy as np
-import base64
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def MainAccess():
-    response_data = {"message": "Bom"}
+    response_data = {"message": "Test"}
     return jsonify(response_data)
 
 # Load the Haar Cascade classifier for face detection
@@ -18,10 +17,13 @@ face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 # Load the dlib shape predictor for facial landmark detection
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-@app.route('/process_image', methods=['POST'])
+@app.route('/process_image', methods=['GET', 'POST'])
 def process_image():
     # Read the image data from the request
     image = request.files['image'].read()
+    left_defect = False
+    right_defect = False
+    no_defect = False
 
     # Convert the image data to a NumPy array
     nparr = np.frombuffer(image, np.uint8)
@@ -56,32 +58,16 @@ def process_image():
         cv2.putText(frame, "Distance between right eyebrow and nose tip: {:.2f}".format(distance_right_eyebrow_nose_tip), (x-100, y-130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         if distance_left_eyebrow_nose_tip + 5 < distance_right_eyebrow_nose_tip:
-            left_defect = True
-            right_defect = False
-            no_defect = False
-        elif distance_right_eyebrow_nose_tip + 5 < distance_left_eyebrow_nose_tip:
-            left_defect = False
-            right_defect = True
-            no_defect = False
-        else:
-            left_defect = False
-            right_defect = False
-            no_defect = True
+            cv2.putText(frame, "WARNING: Left eyebrow closer to nose than right eyebrow!", (x-150, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        
+            
 
-    # Convert the processed frame to base64-encoded string
-    _, encoded_image = cv2.imencode('.jpg', frame)
-    processed_image_bytes = base64.b64encode(encoded_image.tobytes()).decode('utf-8')
+    # Convert the processed frame back to bytes
+    _, processed_image = cv2.imencode('.jpg', frame)
+    processed_image_bytes = processed_image.tobytes()
 
-    # Create the response data dictionary
-    response_data = {
-        'left_defect': left_defect,
-        'right_defect': right_defect,
-        'no_defect': no_defect,
-        'processed_image': processed_image_bytes
-    }
-
-    # Return the response data as JSON
-    return jsonify(response_data)
+    # Return the processed image as the response
+    return processed_image_bytes
 
 if __name__ == '__main__':
     app.run()
