@@ -21,9 +21,6 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 def process_image():
     # Read the image data from the request
     image = request.files['image'].read()
-    left_defect = False
-    right_defect = False
-    no_defect = False
 
     # Convert the image data to a NumPy array
     nparr = np.frombuffer(image, np.uint8)
