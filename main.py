@@ -21,6 +21,9 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 def process_image():
     # Read the image data from the request
     image = request.files['image'].read()
+    left_defect = False
+    right_defect = False
+    no_defect = False
 
     # Convert the image data to a NumPy array
     nparr = np.frombuffer(image, np.uint8)
@@ -55,14 +58,21 @@ def process_image():
         cv2.putText(frame, "Distance between right eyebrow and nose tip: {:.2f}".format(distance_right_eyebrow_nose_tip), (x-100, y-130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         if distance_left_eyebrow_nose_tip + 5 < distance_right_eyebrow_nose_tip:
-            cv2.putText(frame, "WARNING: Left eyebrow closer to nose than right eyebrow!", (x-150, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            #cv2.putText(frame, "WARNING: Left eyebrow closer to nose than right eyebrow!", (x-150, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            left_defect = True
+        elif distance_right_eyebrow_nose_tip + 5 < distance_left_eyebrow_nose_tip:
+            right_defect = True
+        else:
+            no_defect = True
+            
+        response_data = {"left_defect" : left_defect, "right_defect" : right_defect, "no_defect" : no_defect}
 
     # Convert the processed frame back to bytes
     _, processed_image = cv2.imencode('.jpg', frame)
     processed_image_bytes = processed_image.tobytes()
 
     # Return the processed image as the response
-    return processed_image_bytes
+    return processed_image_bytes, jsonify(response_data)
 
 if __name__ == '__main__':
     app.run()
