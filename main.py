@@ -58,14 +58,9 @@ def process_image():
         cv2.putText(frame, "Distance between right eyebrow and nose tip: {:.2f}".format(distance_right_eyebrow_nose_tip), (x-100, y-130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         if distance_left_eyebrow_nose_tip + 5 < distance_right_eyebrow_nose_tip:
-            #cv2.putText(frame, "WARNING: Left eyebrow closer to nose than right eyebrow!", (x-150, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            left_defect = True
-        elif distance_right_eyebrow_nose_tip + 5 < distance_left_eyebrow_nose_tip:
-            right_defect = True
-        else:
-            no_defect = True
+            cv2.putText(frame, "WARNING: Left eyebrow closer to nose than right eyebrow!", (x-150, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        
             
-        response_data = {"left_defect" : left_defect, "right_defect" : right_defect, "no_defect" : no_defect}
 
     # Convert the processed frame back to bytes
     _, processed_image = cv2.imencode('.jpg', frame)
@@ -73,7 +68,6 @@ def process_image():
 
     # Return the processed image as the response
     return processed_image_bytes
-    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run()
