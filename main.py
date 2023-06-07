@@ -30,6 +30,11 @@ def process_image():
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
+    # Initialize boolean variables
+    left_defect = False
+    right_defect = False
+    no_defect = False
+
     # If a face is detected, detect the facial landmarks and measure the distances
     for (x, y, w, h) in faces:
         # Crop the face region from the frame
@@ -50,21 +55,23 @@ def process_image():
         distance_left_eyebrow_nose_tip = math.sqrt((left_eyebrow_x - nose_tip_x) ** 2 + (left_eyebrow_y - nose_tip_y) ** 2)
         distance_right_eyebrow_nose_tip = math.sqrt((right_eyebrow_x - nose_tip_x) ** 2 + (right_eyebrow_y - nose_tip_y) ** 2)
 
-        # Output the result
-        cv2.putText(frame, "Distance between left eyebrow and nose tip: {:.2f}".format(distance_left_eyebrow_nose_tip), (x-100, y-150), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        cv2.putText(frame, "Distance between right eyebrow and nose tip: {:.2f}".format(distance_right_eyebrow_nose_tip), (x-100, y-130), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        # Update boolean variables based on the distances
+        if distance_left_eyebrow_nose_tip + 8 < distance_right_eyebrow_nose_tip:
+            left_defect = True
+        elif distance_right_eyebrow_nose_tip + 8 < distance_left_eyebrow_nose_tip:
+            right_defect = True
+        else:
+            no_defect = True
 
-        if distance_left_eyebrow_nose_tip + 5 < distance_right_eyebrow_nose_tip:
-            cv2.putText(frame, "WARNING: Left eyebrow closer to nose than right eyebrow!", (x-150, y - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        
-            
+    # Create a dictionary with the boolean results
+    response_data = {
+        "left_defect": left_defect,
+        "right_defect": right_defect,
+        "no_defect": no_defect
+    }
 
-    # Convert the processed frame back to bytes
-    _, processed_image = cv2.imencode('.jpg', frame)
-    processed_image_bytes = processed_image.tobytes()
-
-    # Return the processed image as the response
-    return processed_image_bytes
+    # Return the boolean results as a JSON response
+    return jsonify(response_data)
 
 if __name__ == '__main__':
     app.run()
