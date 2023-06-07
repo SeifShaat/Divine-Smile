@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def MainAccess():
-    response_data = {"message": "Test"}
+    response_data = {"message": "Bom"}
     return jsonify(response_data)
 
 # Load the Haar Cascade classifier for face detection
